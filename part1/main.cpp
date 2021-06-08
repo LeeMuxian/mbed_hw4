@@ -6,6 +6,7 @@
 #define car_len 12.7
 #define car_wid 12.3
 
+Thread t;
 Ticker servo_ticker;
 PwmOut pin5(D5), pin6(D6);
 static BufferedSerial xbee(D1, D0);
@@ -19,6 +20,8 @@ RPCFunction Parking(&parking, "parking");
 void reply_messange(char *xbee_reply, char *messange);
 void check_addr(char *xbee_reply, char *messenger);
 
+void check(void);
+
 int main()
 {     
     pc.set_baud(9600);
@@ -26,6 +29,9 @@ int main()
     char buf[256], outbuf[256];
     FILE *devin = fdopen(&xbee, "r");
     FILE *devout = fdopen(&xbee, "w");
+
+    //t.start(check);
+
     while (1) {
         memset(buf, 0, 256);
         for( int i = 0; ; i++ ) {
@@ -42,6 +48,7 @@ int main()
 
 void parking(Arguments *in, Reply *out) {
     // get argument from RPC to know d1, d2, and direction(west, north, ...)
+    printf("nice\r\n");
     double d1 = in->getArg<double>();
     double d2 = in->getArg<double>();
     const char *direction = in->getArg<const char *>();
@@ -57,10 +64,10 @@ void parking(Arguments *in, Reply *out) {
     // first and fourth argument : length of table                               
     car.setCalibTable(11, pwm_table0, speed_table0, 11, pwm_table1, speed_table1);
 
-    car.goStraightCalib(-8);
+    car.goStraightCalib(-4.8);
     ThisThread::sleep_for((d2 / 3) * 1000);
     car.stop();
-    printf("nice\r\n");
+    
     ThisThread::sleep_for(500ms);
 
     if (direction[0] == 'w') {
@@ -68,10 +75,12 @@ void parking(Arguments *in, Reply *out) {
     } else if (direction[0] == 'e') {
         car.turn(-100, 0.2);
     }
-    ThisThread::sleep_for(1s);
+    ThisThread::sleep_for(1410);
+    car.stop();
 
+    ThisThread::sleep_for(500);
     car.goStraightCalib(-5);
-    ThisThread::sleep_for((d1 / 5) * 1000);
+    ThisThread::sleep_for((d1 / 5) * 500);
     car.stop();
     ThisThread::sleep_for(500ms);
 }
@@ -98,4 +107,14 @@ void check_addr(char *xbee_reply, char *messenger){
    xbee_reply[1] = '\0';
    xbee_reply[2] = '\0';
    xbee_reply[3] = '\0';
+}
+
+void check(void){
+   while(1){
+      /*if(xbee.readable()){
+            char recv[1];
+            xbee.read(recv, sizeof(recv));
+            printf("%c", recv[0]);
+      }*/
+   }
 }
