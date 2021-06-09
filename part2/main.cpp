@@ -46,16 +46,16 @@ void line(Arguments *in, Reply *out) {
     double x2 = in->getArg<double>();
     double y2 = in->getArg<double>();
 
-    if (x2 > 80) {          // turn left
-        car.turn(50, 0.7);
+    if (x2 > 90) {          // turn left
+        car.turn(80, 0.7);
         ThisThread::sleep_for(100ms);
         car.stop();
-    } else if (x2 < 80) {   // turn right
+    } else if (x2 < 70) {   // turn right
         car.turn(50, -0.7);
         ThisThread::sleep_for(100ms);
         car.stop();
     } else {                // go straight
-        car.goStraightCalib(5);
+        car.goStraightCalib(9);
         ThisThread::sleep_for(100ms);
         car.stop();
     }

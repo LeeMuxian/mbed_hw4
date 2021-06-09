@@ -14,6 +14,14 @@ Timer t;
 void calib(Arguments *in, Reply *out);
 RPCFunction Calib(&calib, "calib");
 
+bool check = false, first = false;
+double first_deg;
+
+double pwm_table0[] = {-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150};
+double speed_table0[] = {-9.646, -9.784, -9.025, -8.445, -4.882, 0.000, 5.777, 10.364, 9.885, 9.895, 9.965};
+double pwm_table1[] = {-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150};
+double speed_table1[] = {-8.530, -8.132, -8.690, -8.929, -4.824, 0.000, 4.829, 8.132, 8.371, 9.849, 9.769};
+
 int main() {
     char buf[256], outbuf[256];
     FILE *devin = fdopen(&uart, "r");
@@ -38,7 +46,37 @@ int main() {
 void calib(Arguments *in, Reply *out) {
     double degY = in->getArg<double>();
 
-    if (degY > 355 || degY < 5) {       // if degree is over 180, it means the car is at the right of Apriltag
+    if (first == false) {
+        first_deg = degY;
+        first = true;
+    }
+
+    // first and fourth argument : length of table                               
+    car.setCalibTable(11, pwm_table0, speed_table0, 11, pwm_table1, speed_table1);
+
+    if (degY > 350 || degY < 10) {       // if degree is over 180, it means the car is at the right of Apriltag
+        if (degY < 5 && check == false) {
+            car.goStraight(100);
+            ThisThread::sleep_for(300ms);
+            car.stop();
+            ThisThread::sleep_for(50ms);
+            car.turn(60, 0.6);
+            ThisThread::sleep_for(800ms);
+            car.stop();
+            check = true;
+            printf("33333\r\n");
+        } else if (degY > 355 && check == false) {
+            car.goStraight(100);
+            ThisThread::sleep_for(300ms);
+            car.stop();
+            ThisThread::sleep_for(50ms);
+            car.turn(60, 0.6);
+            ThisThread::sleep_for(800ms);
+            car.stop();
+            check = true;
+            printf("33333\r\n");
+        }
+
         float val;
         
         ping.output();
@@ -60,13 +98,8 @@ void calib(Arguments *in, Reply *out) {
         return;
     }
 
-    if (degY > 180) {
-        car.turn(50, -0.8);
-        ThisThread::sleep_for(50ms);
-        car.stop();
-    } else if (degY > 0) {
-        car.turn(50, 0.8);
-        ThisThread::sleep_for(100ms);
-        car.stop();
-    }
+    car.goStraight(100);
+    ThisThread::sleep_for(50ms);
+    car.stop();
+    printf("1111\r\n");
 }
