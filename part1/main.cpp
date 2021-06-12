@@ -64,8 +64,9 @@ void parking(Arguments *in, Reply *out) {
     // first and fourth argument : length of table                               
     car.setCalibTable(11, pwm_table0, speed_table0, 11, pwm_table1, speed_table1);
 
-    car.goStraightCalib(-4.8);
-    ThisThread::sleep_for((d2 / 3) * 1000);
+    car.goStraight(-200);
+    //car.goStraightCalib(-8);
+    ThisThread::sleep_for((d2 / 3) * 450);
     car.stop();
     
     ThisThread::sleep_for(500ms);
@@ -78,9 +79,10 @@ void parking(Arguments *in, Reply *out) {
     ThisThread::sleep_for(1410);
     car.stop();
 
-    ThisThread::sleep_for(500);
-    car.goStraightCalib(-5);
-    ThisThread::sleep_for((d1 / 5) * 500);
+    ThisThread::sleep_for(1200ms);
+    car.goStraight(-200);
+    //car.goStraightCalib(-8);
+    ThisThread::sleep_for((d1 / 5) * 300);
     car.stop();
     ThisThread::sleep_for(500ms);
 }
